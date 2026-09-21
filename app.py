@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
@@ -64,3 +65,6 @@ def predict(data: IrisInput):
         "class_id": prediction,
         "prediction": species[prediction],
     }
+@app.get("/ui")
+def home():
+    return FileResponse("index.html")
