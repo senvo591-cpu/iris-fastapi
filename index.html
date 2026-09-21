@@ -1,1808 +1,1426 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>IRIS AI - SVM Vision</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            color: white;
+            background:
+                radial-gradient(circle at 10% 20%,
+                    rgba(124, 58, 237, 0.25),
+                    transparent 35%),
+                radial-gradient(circle at 90% 80%,
+                    rgba(6, 182, 212, 0.18),
+                    transparent 35%),
+                #070b18;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                );
+            background-size: 45px 45px;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 35px 0 60px;
+        }
+
+        /* HEADER */
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 45px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #4f46e5,
+                    #06b6d4
+                );
+
+            box-shadow:
+                0 0 30px rgba(124,58,237,0.4);
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .brand-text p {
+            color: #7f8aa8;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        .status {
+            padding: 9px 15px;
+            border: 1px solid rgba(34,197,94,0.25);
+            border-radius: 50px;
+            color: #86efac;
+            background: rgba(34,197,94,0.08);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .status span {
+            color: #22c55e;
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .hero small {
+            color: #8b5cf6;
+            letter-spacing: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 7vw, 78px);
+            line-height: 1;
+            margin: 15px 0;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #ffffff,
+                    #a78bfa,
+                    #67e8f9
+                );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: #8e99b5;
+            max-width: 650px;
+            margin: auto;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* MAIN */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns:
+                minmax(300px, 0.9fr)
+                minmax(350px, 1.1fr);
+            gap: 25px;
+        }
+
+        /* PANEL */
+
+        .panel {
+            position: relative;
+            padding: 28px;
+            border-radius: 25px;
+
+            background:
+                rgba(15, 23, 42, 0.72);
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,0.3);
+
+            backdrop-filter: blur(18px);
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: -100px;
+            right: -70px;
+            border-radius: 50%;
+            background: rgba(124,58,237,0.12);
+            filter: blur(30px);
+        }
+
+        .panel-title {
+            position: relative;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+
+        .panel-title strong {
+            color: white;
+            font-size: 18px;
+        }
+
+        /* INPUT */
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .input-box label {
+            display: block;
+            color: #8f9bb7;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.045);
+
+            color: white;
+            font-size: 16px;
+            transition: 0.25s;
+        }
+
+        .input-box input:focus {
+            border-color: #8b5cf6;
+
+            background:
+                rgba(139,92,246,0.08);
+
+            box-shadow:
+                0 0 20px rgba(139,92,246,0.12);
+        }
+
+        .input-box input::placeholder {
+            color: #536079;
+        }
+
+        /* BUTTON */
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 14px;
+            padding: 14px 20px;
+            font-weight: bold;
+            font-size: 14px;
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            flex: 1;
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #4f46e5
+                );
+
+            box-shadow:
+                0 12px 30px rgba(79,70,229,0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 16px 35px rgba(79,70,229,0.4);
+        }
+
+        .btn-secondary {
+            color: #b7c0d6;
+
+            background:
+                rgba(255,255,255,0.06);
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+
+            background:
+                rgba(255,255,255,0.1);
+        }
+
+        .sample {
+            width: 100%;
+            margin-top: 12px;
+
+            background: transparent;
+            color: #8ea0c6;
+
+            border:
+                1px dashed rgba(255,255,255,0.12);
+        }
+
+        /* RESULT */
+
+        .result-panel {
+            min-height: 520px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .result-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .live {
+            color: #86efac;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        /* FLOWER IMAGE */
+
+        .flower-orbit {
+            width: 230px;
+            height: 230px;
+
+            margin: 15px auto 20px;
+
+            padding: 7px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #4f46e5,
+                    #06b6d4
+                );
+
+            box-shadow:
+                0 0 35px rgba(124,58,237,0.35),
+                0 0 80px rgba(79,70,229,0.15);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-<meta charset="UTF-8">
+            position: relative;
+        }
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+        .flower-orbit::before {
+            content: "";
 
-<title>IRIS AI • SVM Vision</title>
+            position: absolute;
+            inset: -12px;
 
-<style>
+            border-radius: 50%;
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Inter,Arial,sans-serif;
-}
+            border:
+                1px dashed rgba(139,92,246,0.35);
 
-body{
+            animation:
+                spin 12s linear infinite;
+        }
 
-    min-height:100vh;
+        .flower-orbit img {
+            width: 100%;
+            height: 100%;
 
-    color:white;
+            object-fit: cover;
 
-    overflow-x:hidden;
+            border-radius: 50%;
 
-    background:
-        radial-gradient(
-            circle at 15% 20%,
-            rgba(99,102,241,.28),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 85% 80%,
-            rgba(168,85,247,.25),
-            transparent 30%
-        ),
-        #080b18;
-}
+            display: block;
 
+            border:
+                4px solid rgba(255,255,255,0.1);
 
-/* =========================
-   BACKGROUND EFFECT
-========================= */
+            opacity: 1;
 
-body::before{
+            transition:
+                opacity 0.5s ease,
+                transform 0.5s ease;
+        }
 
-    content:"";
+        .flower-orbit img:hover {
+            transform: scale(1.04);
+        }
 
-    position:fixed;
+        @keyframes spin {
 
-    inset:0;
+            from {
+                transform: rotate(0deg);
+            }
 
-    pointer-events:none;
+            to {
+                transform: rotate(360deg);
+            }
 
-    background-image:
-        linear-gradient(
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.025) 1px,
-            transparent 1px
-        );
+        }
 
-    background-size:50px 50px;
+        /* RESULT TEXT */
 
-    mask-image:
-        linear-gradient(
-            to bottom,
-            black,
-            transparent
-        );
-}
+        .prediction {
+            font-size: 30px;
+            font-weight: 800;
+            margin-top: 5px;
 
+            background:
+                linear-gradient(
+                    90deg,
+                    #c4b5fd,
+                    #67e8f9
+                );
 
-/* =========================
-   HEADER
-========================= */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-.header{
+        .flower-name {
+            margin-top: 8px;
 
-    max-width:1250px;
+            font-size: 16px;
 
-    margin:auto;
+            color: #a5b4fc;
 
-    padding:35px 30px 20px;
+            letter-spacing: 1px;
+        }
 
-    display:flex;
+        .flower-description {
+            max-width: 500px;
 
-    justify-content:space-between;
+            margin: 12px auto 0;
 
-    align-items:center;
-}
+            color: #9aa6c1;
 
-.brand{
+            font-size: 13px;
 
-    display:flex;
+            line-height: 1.7;
+        }
 
-    align-items:center;
+        /* STATS */
 
-    gap:14px;
-}
+        .stats {
+            display: grid;
 
-.brand-icon{
+            grid-template-columns:
+                repeat(3, 1fr);
 
-    width:48px;
-    height:48px;
+            gap: 10px;
 
-    border-radius:15px;
+            margin-top: 25px;
+        }
 
-    display:flex;
+        .stat {
+            padding: 13px 8px;
 
-    align-items:center;
-    justify-content:center;
+            border-radius: 12px;
 
-    font-size:25px;
+            background:
+                rgba(255,255,255,0.035);
 
-    background:
-        linear-gradient(
-            135deg,
-            #6366f1,
-            #a855f7
-        );
+            border:
+                1px solid rgba(255,255,255,0.05);
+        }
 
-    box-shadow:
-        0 0 30px
-        rgba(139,92,246,.5);
-}
+        .stat strong {
+            display: block;
 
-.brand h1{
+            font-size: 16px;
 
-    font-size:18px;
+            color: white;
+        }
 
-    letter-spacing:2px;
-}
+        .stat span {
+            color: #69758f;
 
-.brand span{
+            font-size: 10px;
 
-    display:block;
+            letter-spacing: 1px;
+        }
 
-    margin-top:4px;
+        /* ERROR */
 
-    color:#8b93ad;
+        .error {
+            display: none;
 
-    font-size:12px;
+            margin-top: 15px;
 
-    letter-spacing:1px;
-}
+            padding: 12px;
 
-.status{
+            border-radius: 12px;
 
-    display:flex;
+            background:
+                rgba(239,68,68,0.08);
 
-    align-items:center;
+            border:
+                1px solid rgba(239,68,68,0.2);
 
-    gap:8px;
+            color: #fca5a5;
 
-    padding:9px 15px;
+            font-size: 13px;
+        }
 
-    border-radius:30px;
+        /* FOOTER */
 
-    background:
-        rgba(34,197,94,.08);
+        footer {
+            text-align: center;
 
-    border:
-        1px solid
-        rgba(34,197,94,.25);
+            margin-top: 35px;
 
-    color:#86efac;
+            color: #4f5b75;
 
-    font-size:12px;
-}
+            font-size: 11px;
 
-.status-dot{
+            letter-spacing: 1px;
+        }
 
-    width:7px;
-    height:7px;
+        /* RESPONSIVE */
 
-    border-radius:50%;
+        @media (max-width: 850px) {
 
-    background:#22c55e;
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
 
-    box-shadow:
-        0 0 12px #22c55e;
-}
+            .result-panel {
+                min-height: auto;
+            }
 
+        }
 
-/* =========================
-   HERO
-========================= */
+        @media (max-width: 600px) {
 
-.hero{
+            header {
+                align-items: flex-start;
+                gap: 15px;
+            }
 
-    max-width:1250px;
+            .status {
+                display: none;
+            }
 
-    margin:25px auto 35px;
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
 
-    padding:0 30px;
-}
+            .buttons {
+                flex-direction: column;
+            }
 
-.hero h2{
+            .flower-orbit {
+                width: 190px;
+                height: 190px;
+            }
 
-    font-size:clamp(
-        42px,
-        6vw,
-        76px
-    );
+            .stats {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
 
-    line-height:.95;
+        }
 
-    letter-spacing:-4px;
-
-    font-weight:800;
-
-    max-width:850px;
-}
-
-.gradient-text{
-
-    background:
-        linear-gradient(
-            90deg,
-            #818cf8,
-            #c084fc,
-            #f0abfc
-        );
-
-    -webkit-background-clip:text;
-
-    color:transparent;
-}
-
-.hero p{
-
-    margin-top:25px;
-
-    max-width:650px;
-
-    color:#8b93ad;
-
-    font-size:16px;
-
-    line-height:1.7;
-}
-
-
-/* =========================
-   MAIN
-========================= */
-
-.main{
-
-    max-width:1250px;
-
-    margin:auto;
-
-    padding:0 30px 40px;
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 1.25fr;
-
-    gap:25px;
-}
-
-
-/* =========================
-   GLASS CARD
-========================= */
-
-.glass{
-
-    position:relative;
-
-    background:
-        rgba(255,255,255,.045);
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-
-    border-radius:28px;
-
-    backdrop-filter:blur(25px);
-
-    box-shadow:
-        0 30px 80px
-        rgba(0,0,0,.35);
-
-    overflow:hidden;
-}
-
-.glass::before{
-
-    content:"";
-
-    position:absolute;
-
-    width:200px;
-    height:200px;
-
-    top:-100px;
-    right:-100px;
-
-    border-radius:50%;
-
-    background:
-        rgba(139,92,246,.18);
-
-    filter:blur(50px);
-}
-
-
-/* =========================
-   INPUT PANEL
-========================= */
-
-.input-panel{
-
-    padding:30px;
-}
-
-.panel-head{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:25px;
-}
-
-.panel-title{
-
-    font-size:19px;
-
-    font-weight:700;
-}
-
-.panel-sub{
-
-    color:#737c98;
-
-    font-size:12px;
-
-    margin-top:5px;
-}
-
-.ai-badge{
-
-    padding:7px 11px;
-
-    border-radius:10px;
-
-    color:#c4b5fd;
-
-    background:
-        rgba(139,92,246,.12);
-
-    border:
-        1px solid
-        rgba(139,92,246,.2);
-
-    font-size:11px;
-}
-
-
-/* =========================
-   FEATURE
-========================= */
-
-.feature{
-
-    margin-bottom:17px;
-}
-
-.feature-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-bottom:8px;
-}
-
-.feature-name{
-
-    color:#cbd5e1;
-
-    font-size:13px;
-}
-
-.feature-unit{
-
-    color:#59627a;
-
-    font-size:11px;
-}
-
-.input-wrap{
-
-    position:relative;
-}
-
-.input-wrap input{
-
-    width:100%;
-
-    padding:15px 45px 15px 16px;
-
-    color:white;
-
-    background:
-        rgba(5,8,20,.7);
-
-    border:
-        1px solid
-        #252b40;
-
-    border-radius:14px;
-
-    outline:none;
-
-    font-size:15px;
-
-    transition:.25s;
-}
-
-.input-wrap input:focus{
-
-    border-color:#8b5cf6;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(139,92,246,.12),
-        0 0 25px
-        rgba(139,92,246,.08);
-}
-
-.input-icon{
-
-    position:absolute;
-
-    right:15px;
-
-    top:50%;
-
-    transform:
-        translateY(-50%);
-
-    color:#6366f1;
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-.actions{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:10px;
-
-    margin-top:25px;
-}
-
-button{
-
-    border:none;
-
-    cursor:pointer;
-
-    padding:14px;
-
-    border-radius:14px;
-
-    font-weight:700;
-
-    transition:.25s;
-}
-
-.predict{
-
-    color:white;
-
-    background:
-        linear-gradient(
-            135deg,
-            #6366f1,
-            #a855f7
-        );
-
-    box-shadow:
-        0 10px 30px
-        rgba(99,102,241,.25);
-}
-
-.predict:hover{
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 15px 40px
-        rgba(139,92,246,.4);
-}
-
-.reset{
-
-    color:#aab2c8;
-
-    background:
-        rgba(255,255,255,.05);
-
-    border:
-        1px solid
-        rgba(255,255,255,.08);
-}
-
-.reset:hover{
-
-    background:
-        rgba(255,255,255,.09);
-}
-
-.sample{
-
-    width:100%;
-
-    margin-top:10px;
-
-    color:#a5b4fc;
-
-    background:
-        rgba(99,102,241,.08);
-
-    border:
-        1px dashed
-        rgba(129,140,248,.3);
-}
-
-
-/* =========================
-   ERROR
-========================= */
-
-.error{
-
-    display:none;
-
-    margin-top:6px;
-
-    color:#fb7185;
-
-    font-size:11px;
-}
-
-.input-error{
-
-    border-color:#fb7185 !important;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(244,63,94,.08) !important;
-}
-
-
-/* =========================
-   RESULT PANEL
-========================= */
-
-.result-panel{
-
-    padding:30px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    min-height:540px;
-}
-
-.result-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-}
-
-.live{
-
-    color:#64748b;
-
-    font-size:11px;
-
-    letter-spacing:1px;
-}
-
-
-/* =========================
-   FLOWER
-========================= */
-
-.flower-stage{
-
-    flex:1;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    position:relative;
-
-    min-height:300px;
-}
-
-.orbit{
-
-    position:absolute;
-
-    width:260px;
-    height:260px;
-
-    border-radius:50%;
-
-    border:
-        1px solid
-        rgba(139,92,246,.2);
-
-    animation:
-        rotate 15s linear infinite;
-}
-
-.orbit::before{
-
-    content:"";
-
-    position:absolute;
-
-    width:7px;
-    height:7px;
-
-    border-radius:50%;
-
-    background:#c084fc;
-
-    box-shadow:
-        0 0 15px #c084fc;
-
-    top:20px;
-
-    left:50%;
-}
-
-@keyframes rotate{
-
-    to{
-        transform:rotate(360deg);
-    }
-
-}
-
-.flower{
-
-    width:150px;
-    height:150px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    font-size:90px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(139,92,246,.3),
-            rgba(99,102,241,.04)
-        );
-
-    box-shadow:
-        0 0 70px
-        rgba(139,92,246,.2);
-}
-
-
-/* =========================
-   RESULT TEXT
-========================= */
-
-.result-label{
-
-    text-align:center;
-
-    color:#68718a;
-
-    font-size:11px;
-
-    letter-spacing:2px;
-}
-
-.result-name{
-
-    text-align:center;
-
-    font-size:34px;
-
-    font-weight:800;
-
-    margin-top:8px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #818cf8,
-            #e879f9
-        );
-
-    -webkit-background-clip:text;
-
-    color:transparent;
-}
-
-.result-desc{
-
-    text-align:center;
-
-    color:#737c98;
-
-    font-size:13px;
-
-    margin-top:8px;
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.stats{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap:10px;
-
-    margin-top:25px;
-}
-
-.stat{
-
-    padding:14px;
-
-    border-radius:15px;
-
-    background:
-        rgba(255,255,255,.035);
-
-    border:
-        1px solid
-        rgba(255,255,255,.06);
-
-    text-align:center;
-}
-
-.stat strong{
-
-    display:block;
-
-    font-size:16px;
-
-    color:#c4b5fd;
-}
-
-.stat span{
-
-    color:#5f6880;
-
-    font-size:10px;
-
-    margin-top:4px;
-
-    display:block;
-}
-
-
-/* =========================
-   ALERT
-========================= */
-
-.alert{
-
-    display:none;
-
-    margin-top:15px;
-
-    padding:12px;
-
-    border-radius:12px;
-
-    font-size:12px;
-
-    line-height:1.5;
-}
-
-.alert.error{
-
-    display:block;
-
-    background:
-        rgba(244,63,94,.08);
-
-    border:
-        1px solid
-        rgba(244,63,94,.2);
-
-    color:#fb7185;
-}
-
-.alert.success{
-
-    display:block;
-
-    background:
-        rgba(34,197,94,.08);
-
-    border:
-        1px solid
-        rgba(34,197,94,.2);
-
-    color:#86efac;
-}
-
-
-/* =========================
-   FOOTER
-========================= */
-
-.footer{
-
-    text-align:center;
-
-    padding:0 30px 25px;
-
-    color:#3f4860;
-
-    font-size:11px;
-
-    letter-spacing:1px;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:850px){
-
-    .header{
-
-        padding:25px 20px;
-    }
-
-    .hero{
-
-        padding:0 20px;
-    }
-
-    .hero h2{
-
-        font-size:45px;
-
-        letter-spacing:-2px;
-    }
-
-    .main{
-
-        padding:0 20px 30px;
-
-        grid-template-columns:1fr;
-    }
-
-    .status{
-
-        display:none;
-    }
-
-}
-
-</style>
+    </style>
 
 </head>
 
 
 <body>
 
+<div class="container">
 
-<!-- =========================
-     HEADER
-========================= -->
+    <!-- HEADER -->
 
-<header class="header">
+    <header>
 
-    <div class="brand">
+        <div class="brand">
 
-        <div class="brand-icon">
-            🌸
-        </div>
-
-        <div>
-
-            <h1>IRIS AI</h1>
-
-            <span>
-                INTELLIGENT FLOWER CLASSIFICATION
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <div class="status">
-
-        <div class="status-dot"></div>
-
-        SVM MODEL ONLINE
-
-    </div>
-
-</header>
-
-
-
-<!-- =========================
-     HERO
-========================= -->
-
-<section class="hero">
-
-    <h2>
-
-        See the flower.
-        <br>
-
-        <span class="gradient-text">
-            Let AI identify it.
-        </span>
-
-    </h2>
-
-
-    <p>
-
-        Hệ thống phân loại hoa Iris sử dụng
-        thuật toán Support Vector Machine.
-        Nhập các đặc trưng của hoa và để mô hình
-        AI thực hiện dự đoán.
-
-    </p>
-
-</section>
-
-
-
-<!-- =========================
-     MAIN
-========================= -->
-
-<main class="main">
-
-
-    <!-- INPUT -->
-
-    <section class="glass input-panel">
-
-        <div class="panel-head">
-
-            <div>
-
-                <div class="panel-title">
-                    Flower Features
-                </div>
-
-                <div class="panel-sub">
-                    Nhập thông số đo được
-                </div>
-
-            </div>
-
-            <div class="ai-badge">
-                SVM
-            </div>
-
-        </div>
-
-
-        <!-- SEPAL LENGTH -->
-
-        <div class="feature">
-
-            <div class="feature-top">
-
-                <span class="feature-name">
-                    Sepal Length
-                </span>
-
-                <span class="feature-unit">
-                    centimeters
-                </span>
-
-            </div>
-
-            <div class="input-wrap">
-
-                <input
-                    id="sepal_length"
-                    type="number"
-                    step="0.1"
-                    placeholder="5.1"
-                >
-
-                <span class="input-icon">
-                    ◈
-                </span>
-
-            </div>
-
-            <div
-                id="error_sepal_length"
-                class="error"
-            ></div>
-
-        </div>
-
-
-        <!-- SEPAL WIDTH -->
-
-        <div class="feature">
-
-            <div class="feature-top">
-
-                <span class="feature-name">
-                    Sepal Width
-                </span>
-
-                <span class="feature-unit">
-                    centimeters
-                </span>
-
-            </div>
-
-            <div class="input-wrap">
-
-                <input
-                    id="sepal_width"
-                    type="number"
-                    step="0.1"
-                    placeholder="3.5"
-                >
-
-                <span class="input-icon">
-                    ◇
-                </span>
-
-            </div>
-
-            <div
-                id="error_sepal_width"
-                class="error"
-            ></div>
-
-        </div>
-
-
-        <!-- PETAL LENGTH -->
-
-        <div class="feature">
-
-            <div class="feature-top">
-
-                <span class="feature-name">
-                    Petal Length
-                </span>
-
-                <span class="feature-unit">
-                    centimeters
-                </span>
-
-            </div>
-
-            <div class="input-wrap">
-
-                <input
-                    id="petal_length"
-                    type="number"
-                    step="0.1"
-                    placeholder="1.4"
-                >
-
-                <span class="input-icon">
-                    ◉
-                </span>
-
-            </div>
-
-            <div
-                id="error_petal_length"
-                class="error"
-            ></div>
-
-        </div>
-
-
-        <!-- PETAL WIDTH -->
-
-        <div class="feature">
-
-            <div class="feature-top">
-
-                <span class="feature-name">
-                    Petal Width
-                </span>
-
-                <span class="feature-unit">
-                    centimeters
-                </span>
-
-            </div>
-
-            <div class="input-wrap">
-
-                <input
-                    id="petal_width"
-                    type="number"
-                    step="0.1"
-                    placeholder="0.2"
-                >
-
-                <span class="input-icon">
-                    ◉
-                </span>
-
-            </div>
-
-            <div
-                id="error_petal_width"
-                class="error"
-            ></div>
-
-        </div>
-
-
-        <!-- BUTTONS -->
-
-        <div class="actions">
-
-            <button
-                class="predict"
-                onclick="predict()"
-            >
-                ✦ ANALYZE
-            </button>
-
-            <button
-                class="reset"
-                onclick="resetForm()"
-            >
-                RESET
-            </button>
-
-        </div>
-
-
-        <button
-            class="sample"
-            onclick="fillSample()"
-        >
-            ✨ Use sample Iris data
-        </button>
-
-
-        <div
-            id="alert"
-            class="alert"
-        ></div>
-
-    </section>
-
-
-
-    <!-- RESULT -->
-
-    <section class="glass result-panel">
-
-
-        <div class="result-top">
-
-           
-
-            <div class="live">
-                ● LIVE ANALYSIS
-            </div>
-
-        </div>
-
-
-        <div class="flower-stage">
-
-            <div class="orbit"></div>
-
-            <div
-                id="resultIcon"
-                class="flower"
-            >
+            <div class="brand-logo">
                 🌸
             </div>
 
-        </div>
+            <div class="brand-text">
 
+                <h2>IRIS AI</h2>
 
-        <div class="result-label">
-            PREDICTED SPECIES
-        </div>
-
-
-        <div
-            id="resultName"
-            class="result-name"
-        >
-            Awaiting input
-        </div>
-
-
-        <div
-            id="resultDescription"
-            class="result-desc"
-        >
-            Enter flower measurements
-            to begin analysis.
-        </div>
-
-
-        <!-- STATS -->
-
-        <div class="stats">
-
-            <div class="stat">
-
-                <strong>
-                    4
-                </strong>
-
-                <span>
-                    FEATURES
-                </span>
-
-            </div>
-
-
-            <div class="stat">
-
-                <strong>
-                    SVM
-                </strong>
-
-                <span>
-                    ALGORITHM
-                </span>
-
-            </div>
-
-
-            <div class="stat">
-
-                <strong>
-                    3
-                </strong>
-
-                <span>
-                    CLASSES
-                </span>
+                <p>
+                    INTELLIGENT FLOWER CLASSIFICATION
+                </p>
 
             </div>
 
         </div>
+
+        <div class="status">
+            <span>●</span> SVM MODEL ONLINE
+        </div>
+
+    </header>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <small>
+            SUPPORT VECTOR MACHINE
+        </small>
+
+        <h1>
+            See the flower.<br>
+            Let AI identify it.
+        </h1>
+
+        <p>
+            Nhập các thông số hình thái của hoa Iris.
+            Hệ thống sử dụng mô hình SVM để phân loại
+            hoa thành một trong ba loài:
+            Setosa, Versicolor hoặc Virginica.
+        </p>
 
     </section>
 
-</main>
+
+    <!-- MAIN -->
+
+    <div class="main-grid">
 
 
+        <!-- INPUT -->
 
-<div class="footer">
+        <div class="panel">
 
-    IRIS AI • MACHINE LEARNING PROJECT • FASTAPI + SVM
+            <div class="panel-title">
+
+                MODEL INPUT
+
+                <br>
+
+                <strong>
+                    Nhập thông số của hoa
+                </strong>
+
+            </div>
+
+
+            <div class="input-grid">
+
+
+                <div class="input-box">
+
+                    <label>
+                        Sepal Length (cm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="sepal_length"
+                        step="0.1"
+                        placeholder="Ví dụ: 5.1"
+                    >
+
+                </div>
+
+
+                <div class="input-box">
+
+                    <label>
+                        Sepal Width (cm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="sepal_width"
+                        step="0.1"
+                        placeholder="Ví dụ: 3.5"
+                    >
+
+                </div>
+
+
+                <div class="input-box">
+
+                    <label>
+                        Petal Length (cm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="petal_length"
+                        step="0.1"
+                        placeholder="Ví dụ: 1.4"
+                    >
+
+                </div>
+
+
+                <div class="input-box">
+
+                    <label>
+                        Petal Width (cm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="petal_width"
+                        step="0.1"
+                        placeholder="Ví dụ: 0.2"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="error"
+                id="error"
+            ></div>
+
+
+            <div class="buttons">
+
+                <button
+                    class="btn-primary"
+                    onclick="predict()"
+                >
+                    🔮 Analyze
+                </button>
+
+                <button
+                    class="btn-secondary"
+                    onclick="resetForm()"
+                >
+                    ↺ Reset
+                </button>
+
+            </div>
+
+
+            <button
+                class="sample"
+                onclick="fillSample()"
+            >
+                ✦ Try sample:
+                5.1 · 3.5 · 1.4 · 0.2
+            </button>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div class="panel result-panel">
+
+            <div class="result-top">
+
+                
+
+                <div class="live">
+                    ● LIVE ANALYSIS
+                </div>
+
+            </div>
+
+
+            <!-- ẢNH HOA -->
+
+            <div class="flower-orbit">
+
+                <img
+                    id="flowerImage"
+                    src="https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg"
+                    alt="Iris Setosa"
+                >
+
+            </div>
+
+
+            <!-- KẾT QUẢ -->
+
+            <div
+                class="prediction"
+                id="prediction"
+            >
+                Waiting...
+            </div>
+
+
+            <div
+                class="flower-name"
+                id="flowerName"
+            >
+                Iris Flower
+            </div>
+
+
+            <div
+                class="flower-description"
+                id="flowerDescription"
+            >
+                Nhập 4 thông số ở bên trái và nhấn
+                Analyze để mô hình SVM nhận diện loài hoa.
+            </div>
+
+
+            <!-- THÔNG TIN MÔ HÌNH -->
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <strong>4</strong>
+
+                    <span>
+                        FEATURES
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <strong>SVM</strong>
+
+                    <span>
+                        MODEL
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <strong>3</strong>
+
+                    <span>
+                        CLASSES
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+        IRIS AI • SVM FLOWER CLASSIFICATION • FASTAPI
+    </footer>
 
 </div>
 
 
-
 <script>
 
+    /* ===============================
+       DỮ LIỆU 3 LOÀI HOA
+    =============================== */
 
-/* =========================
-   GET VALUE
-========================= */
+    const flowerData = {
 
-function getValue(id){
+        setosa: {
 
-    const value =
-        document
-        .getElementById(id)
-        .value
-        .trim();
+            name: "Iris Setosa",
 
-    if(value === ""){
-        return null;
-    }
+            image:
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg",
 
-    const number =
-        Number(value);
+            description:
+                "Iris Setosa là loài hoa có màu tím xanh, " +
+                "cánh hoa nhỏ và các đường vân nổi bật. " +
+                "Đây là một trong ba loài hoa được sử dụng " +
+                "trong bộ dữ liệu Iris."
 
-    if(!Number.isFinite(number)){
-        return null;
-    }
-
-    return number;
-}
+        },
 
 
-/* =========================
-   ERROR
-========================= */
+        versicolor: {
 
-function fieldError(
-    id,
-    message
-){
+            name: "Iris Versicolor",
 
-    const input =
-        document.getElementById(id);
+            image:
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_versicolor.jpg",
 
-    const error =
-        document.getElementById(
-            "error_" + id
-        );
+            description:
+                "Iris Versicolor thường có hoa màu xanh tím " +
+                "hoặc tím với các đường vân nổi bật trên cánh hoa. " +
+                "Loài hoa này còn được gọi là Blue Flag Iris."
 
-    input.classList.add(
-        "input-error"
-    );
-
-    error.textContent =
-        "⚠ " + message;
-
-    error.style.display =
-        "block";
-}
+        },
 
 
-function clearError(id){
+        virginica: {
 
-    const input =
-        document.getElementById(id);
+            name: "Iris Virginica",
 
-    const error =
-        document.getElementById(
-            "error_" + id
-        );
+            image:
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_virginica.jpg",
 
-    input.classList.remove(
-        "input-error"
-    );
-
-    error.textContent = "";
-
-    error.style.display =
-        "none";
-}
-
-
-/* =========================
-   VALIDATE
-========================= */
-
-function validate(){
-
-    const ids = [
-        "sepal_length",
-        "sepal_width",
-        "petal_length",
-        "petal_width"
-    ];
-
-    ids.forEach(clearError);
-
-
-    let valid = true;
-
-
-    ids.forEach(id => {
-
-        const value =
-            getValue(id);
-
-        if(value === null){
-
-            fieldError(
-                id,
-                "Vui lòng nhập giá trị."
-            );
-
-            valid = false;
+            description:
+                "Iris Virginica thường có hoa màu xanh tím " +
+                "đến tím, hình dáng hoa thanh mảnh và các " +
+                "đường vân nổi bật trên cánh hoa."
 
         }
-        else if(value <= 0){
-
-            fieldError(
-                id,
-                "Giá trị phải lớn hơn 0."
-            );
-
-            valid = false;
-
-        }
-
-    });
-
-
-    return valid;
-}
-
-
-/* =========================
-   ALERT
-========================= */
-
-function alertMessage(
-    message,
-    type
-){
-
-    const alert =
-        document.getElementById(
-            "alert"
-        );
-
-    alert.textContent =
-        message;
-
-    alert.className =
-        "alert " + type;
-}
-
-
-/* =========================
-   PREDICT
-========================= */
-
-async function predict(){
-
-
-    /*
-    CHECK INPUT
-    */
-
-    if(!validate()){
-
-        alertMessage(
-            "Dữ liệu chưa hợp lệ. Vui lòng kiểm tra các thông số.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const data = {
-
-        sepal_length:
-            getValue("sepal_length"),
-
-        sepal_width:
-            getValue("sepal_width"),
-
-        petal_length:
-            getValue("petal_length"),
-
-        petal_width:
-            getValue("petal_width")
 
     };
 
 
-    /*
-    LOADING
-    */
+    /* ===============================
+       VALIDATE
+    =============================== */
 
-    document.getElementById(
-        "resultName"
-    ).textContent =
-        "Analyzing...";
+    function validate() {
+
+        const values = [
+
+            document.getElementById(
+                "sepal_length"
+            ).value,
+
+            document.getElementById(
+                "sepal_width"
+            ).value,
+
+            document.getElementById(
+                "petal_length"
+            ).value,
+
+            document.getElementById(
+                "petal_width"
+            ).value
+
+        ];
 
 
-    document.getElementById(
-        "resultDescription"
-    ).textContent =
-        "SVM đang phân tích đặc trưng của mẫu hoa...";
+        if (
+            values.some(
+                value => value === ""
+            )
+        ) {
 
-
-    try{
-
-        const response =
-            await fetch(
-                "/predict",
-                {
-
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify(data)
-
-                }
+            showError(
+                "Vui lòng nhập đầy đủ 4 thông số."
             );
 
-
-        if(!response.ok){
-
-            throw new Error(
-                "HTTP " +
-                response.status
-            );
+            return false;
 
         }
 
 
-        const result =
-            await response.json();
+        if (
+            values.some(
+                value => Number(value) <= 0
+            )
+        ) {
+
+            showError(
+                "Các thông số phải lớn hơn 0."
+            );
+
+            return false;
+
+        }
+
+
+        hideError();
+
+        return true;
+
+    }
+
+
+    /* ===============================
+       ERROR
+    =============================== */
+
+    function showError(message) {
+
+        const error =
+            document.getElementById("error");
+
+        error.textContent = message;
+
+        error.style.display = "block";
+
+    }
+
+
+    function hideError() {
+
+        const error =
+            document.getElementById("error");
+
+        error.style.display = "none";
+
+    }
+
+
+    /* ===============================
+       PREDICT
+    =============================== */
+
+    async function predict() {
+
+        if (!validate()) {
+            return;
+        }
+
+
+        const sepal_length =
+            Number(
+                document.getElementById(
+                    "sepal_length"
+                ).value
+            );
+
+
+        const sepal_width =
+            Number(
+                document.getElementById(
+                    "sepal_width"
+                ).value
+            );
+
+
+        const petal_length =
+            Number(
+                document.getElementById(
+                    "petal_length"
+                ).value
+            );
+
+
+        const petal_width =
+            Number(
+                document.getElementById(
+                    "petal_width"
+                ).value
+            );
 
 
         const prediction =
-            result.prediction;
+            document.getElementById(
+                "prediction"
+            );
+
+        const flowerName =
+            document.getElementById(
+                "flowerName"
+            );
+
+        const description =
+            document.getElementById(
+                "flowerDescription"
+            );
 
 
-        if(!prediction){
+        prediction.textContent =
+            "Analyzing...";
 
-            throw new Error(
-                "API không trả về prediction"
+        flowerName.textContent =
+            "SVM đang xử lý";
+
+        description.textContent =
+            "Đang gửi dữ liệu tới mô hình học máy...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/predict",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                sepal_length:
+                                    sepal_length,
+
+                                sepal_width:
+                                    sepal_width,
+
+                                petal_length:
+                                    petal_length,
+
+                                petal_width:
+                                    petal_width
+
+                            })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "API Error: " +
+                    response.status
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            showResult(
+                result.prediction
             );
 
         }
 
 
-        showResult(
-            prediction
-        );
+        catch (error) {
+
+            console.error(error);
 
 
-        alertMessage(
-            "✓ Phân loại thành công.",
-            "success"
-        );
+            showError(
+                "Không thể kết nối tới API. " +
+                "Hãy kiểm tra FastAPI và thử lại."
+            );
 
 
-    }
-    catch(error){
+            prediction.textContent =
+                "Prediction Failed";
 
-        console.error(error);
+            flowerName.textContent =
+                "Connection Error";
 
+            description.textContent =
+                "Không nhận được kết quả từ mô hình SVM.";
 
-        document.getElementById(
-            "resultName"
-        ).textContent =
-            "Prediction Error";
-
-
-        document.getElementById(
-            "resultDescription"
-        ).textContent =
-            "Không thể kết nối đến mô hình SVM.";
-
-
-        document.getElementById(
-            "resultIcon"
-        ).textContent =
-            "⚠️";
-
-
-        alertMessage(
-            "Không thể kết nối với API. Hãy kiểm tra FastAPI đang chạy.",
-            "error"
-        );
+        }
 
     }
 
-}
+
+    /* ===============================
+       HIỂN THỊ KẾT QUẢ
+    =============================== */
+
+    function showResult(prediction) {
+
+        const value =
+            String(prediction).toLowerCase();
 
 
-/* =========================
-   RESULT
-========================= */
+        const image =
+            document.getElementById(
+                "flowerImage"
+            );
 
-function showResult(
-    prediction
-){
+        const predictionText =
+            document.getElementById(
+                "prediction"
+            );
 
-    const name =
-        String(prediction)
-        .toLowerCase();
+        const flowerName =
+            document.getElementById(
+                "flowerName"
+            );
 
-
-    const resultName =
-        document.getElementById(
-            "resultName"
-        );
-
-
-    const resultIcon =
-        document.getElementById(
-            "resultIcon"
-        );
+        const description =
+            document.getElementById(
+                "flowerDescription"
+            );
 
 
-    const description =
-        document.getElementById(
-            "resultDescription"
-        );
+        let flower;
 
 
-    if(
-        name.includes("setosa")
-    ){
+        /* SETOSA */
 
-        resultName.textContent =
-            "Iris Setosa";
+        if (
+            value.includes("setosa")
+        ) {
 
-        resultIcon.textContent =
-            "🌱";
+            flower =
+                flowerData.setosa;
+
+        }
+
+
+        /* VERSICOLOR */
+
+        else if (
+            value.includes("versicolor")
+        ) {
+
+            flower =
+                flowerData.versicolor;
+
+        }
+
+
+        /* VIRGINICA */
+
+        else if (
+            value.includes("virginica")
+        ) {
+
+            flower =
+                flowerData.virginica;
+
+        }
+
+
+        /* UNKNOWN */
+
+        else {
+
+            predictionText.textContent =
+                prediction;
+
+            flowerName.textContent =
+                "Không xác định";
+
+            description.textContent =
+                "Mô hình trả về kết quả chưa được nhận diện.";
+
+            return;
+
+        }
+
+
+        /* TEXT */
+
+        predictionText.textContent =
+            flower.name;
+
+        flowerName.textContent =
+            flower.name;
 
         description.textContent =
-            "Mẫu hoa được mô hình SVM phân loại vào nhóm Iris Setosa.";
+            flower.description;
+
+
+        /* IMAGE */
+
+        image.style.opacity = "0";
+
+
+        setTimeout(
+            function () {
+
+                image.src =
+                    flower.image;
+
+                image.alt =
+                    flower.name;
+
+                image.onload =
+                    function () {
+
+                        image.style.opacity =
+                            "1";
+
+                    };
+
+            },
+            200
+        );
 
     }
 
 
-    else if(
-        name.includes("versicolor")
-    ){
+    /* ===============================
+       SAMPLE
+    =============================== */
 
-        resultName.textContent =
-            "Iris Versicolor";
-
-        resultIcon.textContent =
-            "🌷";
-
-        description.textContent =
-            "Mẫu hoa được mô hình SVM phân loại vào nhóm Iris Versicolor.";
-
-    }
-
-
-    else if(
-        name.includes("virginica")
-    ){
-
-        resultName.textContent =
-            "Iris Virginica";
-
-        resultIcon.textContent =
-            "🌺";
-
-        description.textContent =
-            "Mẫu hoa được mô hình SVM phân loại vào nhóm Iris Virginica.";
-
-    }
-
-
-    else{
-
-        resultName.textContent =
-            prediction;
-
-        resultIcon.textContent =
-            "🌸";
-
-        description.textContent =
-            "Kết quả được trả về từ mô hình SVM.";
-
-    }
-
-}
-
-
-/* =========================
-   SAMPLE
-========================= */
-
-function fillSample(){
-
-    document.getElementById(
-        "sepal_length"
-    ).value = 5.1;
-
-    document.getElementById(
-        "sepal_width"
-    ).value = 3.5;
-
-    document.getElementById(
-        "petal_length"
-    ).value = 1.4;
-
-    document.getElementById(
-        "petal_width"
-    ).value = 0.2;
-
-
-    [
-        "sepal_length",
-        "sepal_width",
-        "petal_length",
-        "petal_width"
-    ].forEach(clearError);
-
-
-    alertMessage(
-        "✓ Đã tải dữ liệu mẫu Iris Setosa.",
-        "success"
-    );
-
-}
-
-
-/* =========================
-   RESET
-========================= */
-
-function resetForm(){
-
-    [
-        "sepal_length",
-        "sepal_width",
-        "petal_length",
-        "petal_width"
-    ].forEach(id => {
+    function fillSample() {
 
         document.getElementById(
-            id
+            "sepal_length"
+        ).value = "5.1";
+
+
+        document.getElementById(
+            "sepal_width"
+        ).value = "3.5";
+
+
+        document.getElementById(
+            "petal_length"
+        ).value = "1.4";
+
+
+        document.getElementById(
+            "petal_width"
+        ).value = "0.2";
+
+
+        hideError();
+
+    }
+
+
+    /* ===============================
+       RESET
+    =============================== */
+
+    function resetForm() {
+
+        document.getElementById(
+            "sepal_length"
         ).value = "";
 
-        clearError(id);
 
-    });
-
-
-    document.getElementById(
-        "resultIcon"
-    ).textContent =
-        "🌸";
+        document.getElementById(
+            "sepal_width"
+        ).value = "";
 
 
-    document.getElementById(
-        "resultName"
-    ).textContent =
-        "Awaiting input";
+        document.getElementById(
+            "petal_length"
+        ).value = "";
 
 
-    document.getElementById(
-        "resultDescription"
-    ).textContent =
-        "Enter flower measurements to begin analysis.";
+        document.getElementById(
+            "petal_width"
+        ).value = "";
 
 
-    document.getElementById(
-        "alert"
-    ).className =
-        "alert";
+        document.getElementById(
+            "prediction"
+        ).textContent =
+            "Waiting...";
 
-}
+
+        document.getElementById(
+            "flowerName"
+        ).textContent =
+            "Iris Flower";
+
+
+        document.getElementById(
+            "flowerDescription"
+        ).textContent =
+            "Nhập 4 thông số ở bên trái và nhấn Analyze để mô hình SVM nhận diện loài hoa.";
+
+
+        document.getElementById(
+            "flowerImage"
+        ).src =
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg";
+
+
+        document.getElementById(
+            "flowerImage"
+        ).alt =
+            "Iris Setosa";
+
+
+        document.getElementById(
+            "flowerImage"
+        ).style.opacity =
+            "1";
+
+
+        hideError();
+
+    }
 
 </script>
 
-
 </body>
+
 </html>
