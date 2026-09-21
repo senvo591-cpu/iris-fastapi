@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Iris SVM | AI Prediction</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Arial, sans-serif;
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(circle at 10% 20%, rgba(99,102,241,.35), transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(236,72,153,.30), transparent 30%),
+                linear-gradient(135deg, #0f172a, #1e1b4b);
+
+            color: #fff;
+            padding: 30px 20px;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .app {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 50px;
+
+            background: rgba(255,255,255,.10);
+            border: 1px solid rgba(255,255,255,.18);
+
+            font-size: 13px;
+            letter-spacing: 1px;
+
+            backdrop-filter: blur(10px);
+
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: clamp(32px, 6vw, 58px);
+            font-weight: 800;
+
+            background: linear-gradient(
+                90deg,
+                #a5b4fc,
+                #f0abfc,
+                #f9a8d4
+            );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        /* =========================
+           MAIN GRID
+        ========================= */
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255,255,255,.09);
+
+            border: 1px solid rgba(255,255,255,.15);
+
+            border-radius: 25px;
+
+            padding: 28px;
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 25px 60px rgba(0,0,0,.30);
+        }
+
+        /* =========================
+           LEFT
+        ========================= */
+
+        .card-title {
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           INPUT
+        ========================= */
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 8px;
+        }
+
+        .input-header label {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .unit {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 14px 16px;
+
+            border-radius: 13px;
+
+            border: 1px solid rgba(255,255,255,.15);
+
+            background: rgba(15,23,42,.65);
+
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+
+            transition: .25s;
+        }
+
+        input:focus {
+            border-color: #a78bfa;
+
+            box-shadow:
+                0 0 0 3px rgba(167,139,250,.15);
+        }
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+
+            border-radius: 13px;
+
+            padding: 14px;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: .25s;
+        }
+
+        .predict-btn {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #a855f7,
+                    #ec4899
+                );
+
+            box-shadow:
+                0 10px 25px rgba(168,85,247,.30);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 15px 30px rgba(168,85,247,.45);
+        }
+
+        .reset-btn {
+            color: #e2e8f0;
+
+            background: rgba(255,255,255,.08);
+
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,.14);
+        }
+
+        /* =========================
+           RESULT
+        ========================= */
+
+        .result-card {
+            display: flex;
+            flex-direction: column;
+
+            min-height: 500px;
+        }
+
+        .result-box {
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            border-radius: 20px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(129,140,248,.16),
+                    transparent 65%
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            padding: 30px;
+        }
+
+        .flower-icon {
+            font-size: 80px;
+
+            margin-bottom: 15px;
+
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .result-label {
+            color: #94a3b8;
+
+            font-size: 14px;
+
+            margin-bottom: 8px;
+        }
+
+        .result-name {
+            font-size: 35px;
+
+            font-weight: 800;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #c4b5fd,
+                    #f9a8d4
+                );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            color: #cbd5e1;
+
+            font-size: 14px;
+
+            max-width: 350px;
+
+            line-height: 1.6;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            margin-top: 18px;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            color: #94a3b8;
+        }
+
+        .success {
+            color: #86efac;
+        }
+
+        .error {
+            color: #fca5a5;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .result-card {
+                min-height: 400px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="badge">
+            MACHINE LEARNING • SVM
+        </div>
+
+        <h1>🌸 Iris Vision AI</h1>
+
+        <p>
+            Hệ thống dự đoán loài hoa Iris bằng thuật toán Support Vector Machine
+        </p>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <div class="main">
+
+        <!-- INPUT CARD -->
+
+        <div class="card">
+
+            <div class="card-title">
+                🔬 Thông số đầu vào
+            </div>
+
+            <div class="card-description">
+                Nhập 4 đặc trưng của hoa Iris.
+                Mô hình SVM sẽ phân tích dữ liệu và dự đoán loài hoa.
+            </div>
+
+
+            <!-- Sepal Length -->
+
+            <div class="input-group">
+
+                <div class="input-header">
+
+                    <label for="sepal_length">
+                        Sepal Length
+                    </label>
+
+                    <span class="unit">
+                        cm
+                    </span>
+
+                </div>
+
+                <input
+                    type="number"
+                    id="sepal_length"
+                    step="0.1"
+                    value="5.1"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- Sepal Width -->
+
+            <div class="input-group">
+
+                <div class="input-header">
+
+                    <label for="sepal_width">
+                        Sepal Width
+                    </label>
+
+                    <span class="unit">
+                        cm
+                    </span>
+
+                </div>
+
+                <input
+                    type="number"
+                    id="sepal_width"
+                    step="0.1"
+                    value="3.5"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- Petal Length -->
+
+            <div class="input-group">
+
+                <div class="input-header">
+
+                    <label for="petal_length">
+                        Petal Length
+                    </label>
+
+                    <span class="unit">
+                        cm
+                    </span>
+
+                </div>
+
+                <input
+                    type="number"
+                    id="petal_length"
+                    step="0.1"
+                    value="1.4"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- Petal Width -->
+
+            <div class="input-group">
+
+                <div class="input-header">
+
+                    <label for="petal_width">
+                        Petal Width
+                    </label>
+
+                    <span class="unit">
+                        cm
+                    </span>
+
+                </div>
+
+                <input
+                    type="number"
+                    id="petal_width"
+                    step="0.1"
+                    value="0.2"
+                    min="0"
+                >
+
+            </div>
+
+
+            <!-- BUTTONS -->
+
+            <div class="buttons">
+
+                <button
+                    class="predict-btn"
+                    onclick="predict()"
+                >
+                    🔮 Dự đoán
+                </button>
+
+                <button
+                    class="reset-btn"
+                    onclick="resetForm()"
+                >
+                    ↺ Đặt lại
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESULT CARD -->
+
+        <div class="card result-card">
+
+            <div class="card-title">
+                🤖 Kết quả AI
+            </div>
+
+            <div class="card-description">
+                Kết quả được trả về từ mô hình SVM thông qua API FastAPI.
+            </div>
+
+
+            <div class="result-box">
+
+                <div
+                    class="flower-icon"
+                    id="flowerIcon"
+                >
+                    🌸
+                </div>
+
+                <div class="result-label">
+                    KẾT QUẢ DỰ ĐOÁN
+                </div>
+
+                <div
+                    class="result-name"
+                    id="resultName"
+                >
+                    Chưa có kết quả
+                </div>
+
+                <div
+                    class="result-description"
+                    id="resultDescription"
+                >
+                    Nhập thông số bên trái và bấm
+                    <b>Dự đoán</b> để bắt đầu.
+                </div>
+
+            </div>
+
+            <div
+                class="status"
+                id="status"
+            >
+                ● Sẵn sàng nhận dữ liệu
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        Iris Vision AI • FastAPI • SVM • Machine Learning
+    </div>
+
+</div>
+
+
+<script>
+
+    async function predict() {
+
+        const sepal_length =
+            parseFloat(
+                document.getElementById("sepal_length").value
+            );
+
+        const sepal_width =
+            parseFloat(
+                document.getElementById("sepal_width").value
+            );
+
+        const petal_length =
+            parseFloat(
+                document.getElementById("petal_length").value
+            );
+
+        const petal_width =
+            parseFloat(
+                document.getElementById("petal_width").value
+            );
+
+
+        const resultName =
+            document.getElementById("resultName");
+
+        const resultDescription =
+            document.getElementById("resultDescription");
+
+        const flowerIcon =
+            document.getElementById("flowerIcon");
+
+        const status =
+            document.getElementById("status");
+
+
+        /* Kiểm tra dữ liệu */
+
+        if (
+            isNaN(sepal_length) ||
+            isNaN(sepal_width) ||
+            isNaN(petal_length) ||
+            isNaN(petal_width)
+        ) {
+
+            resultName.innerText =
+                "Thiếu dữ liệu";
+
+            resultDescription.innerText =
+                "Vui lòng nhập đầy đủ 4 thông số.";
+
+            flowerIcon.innerText = "⚠️";
+
+            status.innerText =
+                "● Dữ liệu chưa hợp lệ";
+
+            status.className = "status error";
+
+            return;
+        }
+
+
+        /* Loading */
+
+        resultName.innerText =
+            "Đang phân tích...";
+
+        resultDescription.innerText =
+            "Mô hình SVM đang xử lý dữ liệu.";
+
+        flowerIcon.innerText = "🧠";
+
+        status.innerText =
+            "● Đang kết nối API...";
+
+        status.className = "status";
+
+
+        try {
+
+            const response =
+                await fetch("/predict", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        sepal_length:
+                            sepal_length,
+
+                        sepal_width:
+                            sepal_width,
+
+                        petal_length:
+                            petal_length,
+
+                        petal_width:
+                            petal_width
+
+                    })
+
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    "API trả về lỗi."
+                );
+
+            }
+
+
+            /* Lấy kết quả */
+
+            const prediction =
+                String(
+                    data.prediction
+                ).toLowerCase();
+
+
+            let icon = "🌸";
+
+            let description =
+                "Mô hình SVM đã phân loại mẫu hoa này.";
+
+
+            if (
+                prediction.includes("setosa")
+            ) {
+
+                icon = "🌱";
+
+                description =
+                    "Đây là hoa Iris Setosa.";
+
+            }
+
+            else if (
+                prediction.includes("versicolor")
+            ) {
+
+                icon = "🌷";
+
+                description =
+                    "Đây là hoa Iris Versicolor.";
+
+            }
+
+            else if (
+                prediction.includes("virginica")
+            ) {
+
+                icon = "🌺";
+
+                description =
+                    "Đây là hoa Iris Virginica.";
+
+            }
+
+
+            /* Hiển thị */
+
+            flowerIcon.innerText = icon;
+
+            resultName.innerText =
+                data.prediction;
+
+            resultDescription.innerText =
+                description;
+
+            status.innerText =
+                "● Dự đoán thành công";
+
+            status.className =
+                "status success";
+
+
+        }
+
+        catch (error) {
+
+            flowerIcon.innerText =
+                "❌";
+
+            resultName.innerText =
+                "Có lỗi";
+
+            resultDescription.innerText =
+                error.message;
+
+            status.innerText =
+                "● Không thể kết nối API";
+
+            status.className =
+                "status error";
+
+        }
+
+    }
+
+
+    /* =========================
+       RESET
+    ========================= */
+
+    function resetForm() {
+
+        document.getElementById(
+            "sepal_length"
+        ).value = "5.1";
+
+        document.getElementById(
+            "sepal_width"
+        ).value = "3.5";
+
+        document.getElementById(
+            "petal_length"
+        ).value = "1.4";
+
+        document.getElementById(
+            "petal_width"
+        ).value = "0.2";
+
+
+        document.getElementById(
+            "flowerIcon"
+        ).innerText = "🌸";
+
+        document.getElementById(
+            "resultName"
+        ).innerText =
+            "Chưa có kết quả";
+
+        document.getElementById(
+            "resultDescription"
+        ).innerHTML =
+            'Nhập thông số bên trái và bấm <b>Dự đoán</b> để bắt đầu.';
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "● Sẵn sàng nhận dữ liệu";
+
+        document.getElementById(
+            "status"
+        ).className =
+            "status";
+
+    }
+
+</script>
+
+</body>
+</html>
