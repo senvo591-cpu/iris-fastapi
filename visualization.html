@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Visualization - IRIS AI</title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+
+            <div class="brand-flower">
+                🌸
+            </div>
+
+            <div>
+
+                <strong>
+                    IRIS AI
+                </strong>
+
+                <span>
+                    SVM FLOWER CLASSIFICATION
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/predict">
+                Predict
+            </a>
+
+            <a
+                href="/visualization"
+                class="active"
+            >
+                Visualization
+            </a>
+
+            <a href="/species">
+                Species
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+
+<main class="page">
+
+
+<section class="page-header">
+
+    <span class="eyebrow">
+        DATA VISUALIZATION
+    </span>
+
+    <h1>
+        Trực quan hóa dữ liệu Iris
+    </h1>
+
+    <p>
+        Quan sát sự khác biệt giữa ba nhóm hoa dựa trên
+        các đặc trưng về chiều dài và chiều rộng của
+        lá đài và cánh hoa.
+    </p>
+
+</section>
+
+
+
+<div class="chart-grid">
+
+
+<!-- SEPAL LENGTH -->
+
+<section class="chart-card">
+
+    <h2>
+        So sánh Sepal Length
+    </h2>
+
+    <p>
+        Giá trị trung bình theo từng loài.
+    </p>
+
+
+    <div class="bars">
+
+        <div class="bar-item">
+
+            <span>
+                Setosa
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 76%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                5.01 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Versicolor
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 89%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                5.94 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Virginica
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 100%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                6.59 cm
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- SEPAL WIDTH -->
+
+<section class="chart-card">
+
+    <h2>
+        So sánh Sepal Width
+    </h2>
+
+    <p>
+        Giá trị trung bình theo từng loài.
+    </p>
+
+
+    <div class="bars">
+
+        <div class="bar-item">
+
+            <span>
+                Setosa
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 100%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                3.43 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Versicolor
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 81%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                2.77 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Virginica
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 87%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                2.97 cm
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- PETAL LENGTH -->
+
+<section class="chart-card">
+
+    <h2>
+        So sánh Petal Length
+    </h2>
+
+    <p>
+        Đặc trưng có khả năng phân biệt các nhóm khá rõ.
+    </p>
+
+
+    <div class="bars">
+
+        <div class="bar-item">
+
+            <span>
+                Setosa
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 26%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                1.46 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Versicolor
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 77%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                4.26 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Virginica
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 100%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                5.55 cm
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- PETAL WIDTH -->
+
+<section class="chart-card">
+
+    <h2>
+        So sánh Petal Width
+    </h2>
+
+    <p>
+        Đặc trưng được sử dụng trực tiếp trong mô hình SVM.
+    </p>
+
+
+    <div class="bars">
+
+        <div class="bar-item">
+
+            <span>
+                Setosa
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 12%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                0.25 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Versicolor
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 65%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                1.33 cm
+            </strong>
+
+        </div>
+
+
+        <div class="bar-item">
+
+            <span>
+                Virginica
+            </span>
+
+            <div class="bar-track">
+
+                <div
+                    class="bar"
+                    style="width: 100%;"
+                ></div>
+
+            </div>
+
+            <strong>
+                2.03 cm
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</div>
+
+
+
+<section class="visual-note">
+
+    <h2>
+        Nhận xét dữ liệu
+    </h2>
+
+    <p>
+        Các đặc trưng về chiều dài và chiều rộng cánh hoa
+        cho thấy sự khác biệt tương đối rõ giữa ba nhóm.
+        Đây là cơ sở để mô hình SVM xây dựng ranh giới
+        phân loại giữa các lớp dữ liệu.
+    </p>
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+    <strong>
+        IRIS AI
+    </strong>
+
+    <span>
+        DATA VISUALIZATION
+    </span>
+
+</footer>
+
+
+</body>
+
+</html>

@@ -1,1425 +1,399 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>IRIS AI - SVM Vision</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            min-height: 100vh;
-            color: white;
-            background:
-                radial-gradient(circle at 10% 20%,
-                    rgba(124, 58, 237, 0.25),
-                    transparent 35%),
-                radial-gradient(circle at 90% 80%,
-                    rgba(6, 182, 212, 0.18),
-                    transparent 35%),
-                #070b18;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(
-                    rgba(255,255,255,0.025) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,0.025) 1px,
-                    transparent 1px
-                );
-            background-size: 45px 45px;
-            pointer-events: none;
-        }
-
-        .container {
-            width: 92%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 35px 0 60px;
-        }
-
-        /* HEADER */
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 45px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .brand-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 15px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 25px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #7c3aed,
-                    #4f46e5,
-                    #06b6d4
-                );
-
-            box-shadow:
-                0 0 30px rgba(124,58,237,0.4);
-        }
-
-        .brand-text h2 {
-            font-size: 18px;
-            letter-spacing: 2px;
-        }
-
-        .brand-text p {
-            color: #7f8aa8;
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
-
-        .status {
-            padding: 9px 15px;
-            border: 1px solid rgba(34,197,94,0.25);
-            border-radius: 50px;
-            color: #86efac;
-            background: rgba(34,197,94,0.08);
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-
-        .status span {
-            color: #22c55e;
-        }
-
-        /* HERO */
-
-        .hero {
-            text-align: center;
-            margin-bottom: 45px;
-        }
-
-        .hero small {
-            color: #8b5cf6;
-            letter-spacing: 4px;
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .hero h1 {
-            font-size: clamp(40px, 7vw, 78px);
-            line-height: 1;
-            margin: 15px 0;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #ffffff,
-                    #a78bfa,
-                    #67e8f9
-                );
-
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            color: #8e99b5;
-            max-width: 650px;
-            margin: auto;
-            line-height: 1.7;
-            font-size: 15px;
-        }
-
-        /* MAIN */
-
-        .main-grid {
-            display: grid;
-            grid-template-columns:
-                minmax(300px, 0.9fr)
-                minmax(350px, 1.1fr);
-            gap: 25px;
-        }
-
-        /* PANEL */
-
-        .panel {
-            position: relative;
-            padding: 28px;
-            border-radius: 25px;
-
-            background:
-                rgba(15, 23, 42, 0.72);
-
-            border:
-                1px solid rgba(255,255,255,0.08);
-
-            box-shadow:
-                0 25px 70px rgba(0,0,0,0.3);
-
-            backdrop-filter: blur(18px);
-            overflow: hidden;
-        }
-
-        .panel::before {
-            content: "";
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            top: -100px;
-            right: -70px;
-            border-radius: 50%;
-            background: rgba(124,58,237,0.12);
-            filter: blur(30px);
-        }
-
-        .panel-title {
-            position: relative;
-            font-size: 13px;
-            letter-spacing: 2px;
-            color: #94a3b8;
-            margin-bottom: 25px;
-        }
-
-        .panel-title strong {
-            color: white;
-            font-size: 18px;
-        }
-
-        /* INPUT */
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .input-box label {
-            display: block;
-            color: #8f9bb7;
-            font-size: 12px;
-            margin-bottom: 8px;
-        }
-
-        .input-box input {
-            width: 100%;
-            padding: 15px;
-            border-radius: 14px;
-
-            border:
-                1px solid rgba(255,255,255,0.08);
-
-            outline: none;
-
-            background:
-                rgba(255,255,255,0.045);
-
-            color: white;
-            font-size: 16px;
-            transition: 0.25s;
-        }
-
-        .input-box input:focus {
-            border-color: #8b5cf6;
-
-            background:
-                rgba(139,92,246,0.08);
-
-            box-shadow:
-                0 0 20px rgba(139,92,246,0.12);
-        }
-
-        .input-box input::placeholder {
-            color: #536079;
-        }
-
-        /* BUTTON */
-
-        .buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
-        button {
-            border: none;
-            cursor: pointer;
-            border-radius: 14px;
-            padding: 14px 20px;
-            font-weight: bold;
-            font-size: 14px;
-            transition:
-                transform 0.2s,
-                box-shadow 0.2s;
-        }
-
-        .btn-primary {
-            flex: 1;
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #7c3aed,
-                    #4f46e5
-                );
-
-            box-shadow:
-                0 12px 30px rgba(79,70,229,0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 16px 35px rgba(79,70,229,0.4);
-        }
-
-        .btn-secondary {
-            color: #b7c0d6;
-
-            background:
-                rgba(255,255,255,0.06);
-
-            border:
-                1px solid rgba(255,255,255,0.08);
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-
-            background:
-                rgba(255,255,255,0.1);
-        }
-
-        .sample {
-            width: 100%;
-            margin-top: 12px;
-
-            background: transparent;
-            color: #8ea0c6;
-
-            border:
-                1px dashed rgba(255,255,255,0.12);
-        }
-
-        /* RESULT */
-
-        .result-panel {
-            min-height: 520px;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            text-align: center;
-        }
-
-        .result-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .result-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .live {
-            color: #86efac;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-
-        /* FLOWER IMAGE */
-
-        .flower-orbit {
-            width: 230px;
-            height: 230px;
-
-            margin: 15px auto 20px;
-
-            padding: 7px;
-
-            border-radius: 50%;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #7c3aed,
-                    #4f46e5,
-                    #06b6d4
-                );
-
-            box-shadow:
-                0 0 35px rgba(124,58,237,0.35),
-                0 0 80px rgba(79,70,229,0.15);
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            position: relative;
-        }
-
-        .flower-orbit::before {
-            content: "";
-
-            position: absolute;
-            inset: -12px;
-
-            border-radius: 50%;
-
-            border:
-                1px dashed rgba(139,92,246,0.35);
-
-            animation:
-                spin 12s linear infinite;
-        }
-
-        .flower-orbit img {
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-
-            border-radius: 50%;
-
-            display: block;
-
-            border:
-                4px solid rgba(255,255,255,0.1);
-
-            opacity: 1;
-
-            transition:
-                opacity 0.5s ease,
-                transform 0.5s ease;
-        }
-
-        .flower-orbit img:hover {
-            transform: scale(1.04);
-        }
-
-        @keyframes spin {
-
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-
-        }
-
-        /* RESULT TEXT */
-
-        .prediction {
-            font-size: 30px;
-            font-weight: 800;
-            margin-top: 5px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    #c4b5fd,
-                    #67e8f9
-                );
-
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .flower-name {
-            margin-top: 8px;
-
-            font-size: 16px;
-
-            color: #a5b4fc;
-
-            letter-spacing: 1px;
-        }
-
-        .flower-description {
-            max-width: 500px;
-
-            margin: 12px auto 0;
-
-            color: #9aa6c1;
-
-            font-size: 13px;
-
-            line-height: 1.7;
-        }
-
-        /* STATS */
-
-        .stats {
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap: 10px;
-
-            margin-top: 25px;
-        }
-
-        .stat {
-            padding: 13px 8px;
-
-            border-radius: 12px;
-
-            background:
-                rgba(255,255,255,0.035);
-
-            border:
-                1px solid rgba(255,255,255,0.05);
-        }
-
-        .stat strong {
-            display: block;
-
-            font-size: 16px;
-
-            color: white;
-        }
-
-        .stat span {
-            color: #69758f;
-
-            font-size: 10px;
-
-            letter-spacing: 1px;
-        }
-
-        /* ERROR */
-
-        .error {
-            display: none;
-
-            margin-top: 15px;
-
-            padding: 12px;
-
-            border-radius: 12px;
-
-            background:
-                rgba(239,68,68,0.08);
-
-            border:
-                1px solid rgba(239,68,68,0.2);
-
-            color: #fca5a5;
-
-            font-size: 13px;
-        }
-
-        /* FOOTER */
-
-        footer {
-            text-align: center;
-
-            margin-top: 35px;
-
-            color: #4f5b75;
-
-            font-size: 11px;
-
-            letter-spacing: 1px;
-        }
-
-        /* RESPONSIVE */
-
-        @media (max-width: 850px) {
-
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .result-panel {
-                min-height: auto;
-            }
-
-        }
-
-        @media (max-width: 600px) {
-
-            header {
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .status {
-                display: none;
-            }
-
-            .input-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .buttons {
-                flex-direction: column;
-            }
-
-            .flower-orbit {
-                width: 190px;
-                height: 190px;
-            }
-
-            .stats {
-                grid-template-columns:
-                    repeat(3, 1fr);
-            }
-
-        }
-
-    </style>
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
 
 </head>
 
 
 <body>
 
-<div class="container">
 
-    <!-- HEADER -->
+<header class="navbar">
 
-    <header>
+    <div class="nav-container">
 
-        <div class="brand">
+        <a href="/" class="brand">
 
-            <div class="brand-logo">
+            <div class="brand-flower">
                 🌸
             </div>
 
-            <div class="brand-text">
-
-                <h2>IRIS AI</h2>
-
-                <p>
-                    INTELLIGENT FLOWER CLASSIFICATION
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="status">
-            <span>●</span> SVM MODEL ONLINE
-        </div>
-
-    </header>
-
-
-    <!-- HERO -->
-
-    <section class="hero">
-
-        <small>
-            SUPPORT VECTOR MACHINE
-        </small>
-
-        <h1>
-            See the flower.<br>
-            Let AI identify it.
-        </h1>
-
-        <p>
-            Nhập các thông số hình thái của hoa Iris.
-            Hệ thống sử dụng mô hình SVM để phân loại
-            hoa thành một trong ba loài:
-            Setosa, Versicolor hoặc Virginica.
-        </p>
-
-    </section>
-
-
-    <!-- MAIN -->
-
-    <div class="main-grid">
-
-
-        <!-- INPUT -->
-
-        <div class="panel">
-
-            <div class="panel-title">
-
-                MODEL INPUT
-
-                <br>
+            <div>
 
                 <strong>
-                    Nhập thông số của hoa
+                    IRIS AI
                 </strong>
 
-            </div>
-
-
-            <div class="input-grid">
-
-
-                <div class="input-box">
-
-                    <label>
-                        Sepal Length (cm)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="sepal_length"
-                        step="0.1"
-                        placeholder="Ví dụ: 5.1"
-                    >
-
-                </div>
-
-
-                <div class="input-box">
-
-                    <label>
-                        Sepal Width (cm)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="sepal_width"
-                        step="0.1"
-                        placeholder="Ví dụ: 3.5"
-                    >
-
-                </div>
-
-
-                <div class="input-box">
-
-                    <label>
-                        Petal Length (cm)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="petal_length"
-                        step="0.1"
-                        placeholder="Ví dụ: 1.4"
-                    >
-
-                </div>
-
-
-                <div class="input-box">
-
-                    <label>
-                        Petal Width (cm)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="petal_width"
-                        step="0.1"
-                        placeholder="Ví dụ: 0.2"
-                    >
-
-                </div>
+                <span>
+                    SVM FLOWER CLASSIFICATION
+                </span>
 
             </div>
 
-
-            <div
-                class="error"
-                id="error"
-            ></div>
+        </a>
 
 
-            <div class="buttons">
+        <nav>
 
-                <button
-                    class="btn-primary"
-                    onclick="predict()"
-                >
-                    🔮 Analyze
-                </button>
-
-                <button
-                    class="btn-secondary"
-                    onclick="resetForm()"
-                >
-                    ↺ Reset
-                </button>
-
-            </div>
-
-
-            <button
-                class="sample"
-                onclick="fillSample()"
+            <a
+                href="/"
+                class="active"
             >
-                ✦ Try sample:
-                5.1 · 3.5 · 1.4 · 0.2
-            </button>
+                Home
+            </a>
 
-        </div>
+            <a href="/predict">
+                Predict
+            </a>
 
+            <a href="/visualization">
+                Visualization
+            </a>
 
-        <!-- RESULT -->
+            <a href="/species">
+                Species
+            </a>
 
-        <div class="panel result-panel">
+        </nav>
 
-            <div class="result-top">
+    </div>
 
-                
-
-                <div class="live">
-                    ● LIVE ANALYSIS
-                </div>
-
-            </div>
-
-
-            <!-- ẢNH HOA -->
-
-            <div class="flower-orbit">
-
-                <img
-                    id="flowerImage"
-                    src="https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg"
-                    alt="Iris Setosa"
-                >
-
-            </div>
+</header>
 
 
-            <!-- KẾT QUẢ -->
 
-            <div
-                class="prediction"
-                id="prediction"
+<main>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="eyebrow">
+            ✦ MACHINE LEARNING PROJECT
+        </span>
+
+
+        <h1>
+
+            Khám phá thế giới Iris
+
+            <span>
+                cùng trí tuệ nhân tạo
+            </span>
+
+        </h1>
+
+
+        <p>
+
+            IRIS AI là hệ thống phân loại hoa Iris sử dụng
+            thuật toán Support Vector Machine (SVM).
+            Từ bốn thông số hình thái của hoa, mô hình có thể
+            dự đoán mẫu thuộc Setosa, Versicolor hoặc Virginica.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <a
+                href="/predict"
+                class="btn primary"
             >
-                Waiting...
-            </div>
+                ✦ Bắt đầu dự đoán
+            </a>
 
 
-            <div
-                class="flower-name"
-                id="flowerName"
+            <a
+                href="/species"
+                class="btn secondary"
             >
-                Iris Flower
-            </div>
-
-
-            <div
-                class="flower-description"
-                id="flowerDescription"
-            >
-                Nhập 4 thông số ở bên trái và nhấn
-                Analyze để mô hình SVM nhận diện loài hoa.
-            </div>
-
-
-            <!-- THÔNG TIN MÔ HÌNH -->
-
-            <div class="stats">
-
-                <div class="stat">
-
-                    <strong>4</strong>
-
-                    <span>
-                        FEATURES
-                    </span>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <strong>SVM</strong>
-
-                    <span>
-                        MODEL
-                    </span>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <strong>3</strong>
-
-                    <span>
-                        CLASSES
-                    </span>
-
-                </div>
-
-            </div>
+                🌸 Khám phá các loài
+            </a>
 
         </div>
 
     </div>
 
+</section>
 
-    <footer>
-        IRIS AI • SVM FLOWER CLASSIFICATION • FASTAPI
-    </footer>
 
-</div>
 
+<section class="stats">
 
-<script>
+    <div class="stat-card">
 
-    /* ===============================
-       DỮ LIỆU 3 LOÀI HOA
-    =============================== */
+        <strong>
+            150
+        </strong>
 
-    const flowerData = {
+        <span>
+            MẪU HOA
+        </span>
 
-        setosa: {
+    </div>
 
-            name: "Iris Setosa",
 
-            image:
-                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg",
+    <div class="stat-card">
 
-            description:
-                "Iris Setosa là loài hoa có màu tím xanh, " +
-                "cánh hoa nhỏ và các đường vân nổi bật. " +
-                "Đây là một trong ba loài hoa được sử dụng " +
-                "trong bộ dữ liệu Iris."
+        <strong>
+            4
+        </strong>
 
-        },
+        <span>
+            ĐẶC TRƯNG
+        </span>
 
+    </div>
 
-        versicolor: {
 
-            name: "Iris Versicolor",
+    <div class="stat-card">
 
-            image:
-                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_versicolor.jpg",
+        <strong>
+            3
+        </strong>
 
-            description:
-                "Iris Versicolor thường có hoa màu xanh tím " +
-                "hoặc tím với các đường vân nổi bật trên cánh hoa. " +
-                "Loài hoa này còn được gọi là Blue Flag Iris."
+        <span>
+            LOÀI HOA
+        </span>
 
-        },
+    </div>
 
+</section>
 
-        virginica: {
 
-            name: "Iris Virginica",
 
-            image:
-                "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_virginica.jpg",
+<section class="home-section">
 
-            description:
-                "Iris Virginica thường có hoa màu xanh tím " +
-                "đến tím, hình dáng hoa thanh mảnh và các " +
-                "đường vân nổi bật trên cánh hoa."
+    <div class="section-heading">
 
-        }
+        <span class="eyebrow">
+            IRIS AI SYSTEM
+        </span>
 
-    };
+        <h2>
+            Hệ thống gồm những gì?
+        </h2>
 
+        <p>
+            Khám phá từng thành phần của dự án Iris AI.
+        </p>
 
-    /* ===============================
-       VALIDATE
-    =============================== */
+    </div>
 
-    function validate() {
 
-        const values = [
 
-            document.getElementById(
-                "sepal_length"
-            ).value,
+    <div class="feature-grid">
 
-            document.getElementById(
-                "sepal_width"
-            ).value,
 
-            document.getElementById(
-                "petal_length"
-            ).value,
+        <a
+            href="/predict"
+            class="feature-card"
+        >
 
-            document.getElementById(
-                "petal_width"
-            ).value
+            <div class="feature-icon">
+                ✦
+            </div>
 
-        ];
+            <h3>
+                Predict
+            </h3>
 
+            <p>
+                Nhập bốn thông số của hoa để mô hình SVM
+                thực hiện phân loại tự động.
+            </p>
 
-        if (
-            values.some(
-                value => value === ""
-            )
-        ) {
+        </a>
 
-            showError(
-                "Vui lòng nhập đầy đủ 4 thông số."
-            );
 
-            return false;
 
-        }
+        <a
+            href="/visualization"
+            class="feature-card"
+        >
 
+            <div class="feature-icon">
+                ◈
+            </div>
 
-        if (
-            values.some(
-                value => Number(value) <= 0
-            )
-        ) {
+            <h3>
+                Visualization
+            </h3>
 
-            showError(
-                "Các thông số phải lớn hơn 0."
-            );
+            <p>
+                Quan sát sự khác biệt giữa ba nhóm hoa
+                thông qua các đặc trưng trong bộ dữ liệu.
+            </p>
 
-            return false;
+        </a>
 
-        }
 
 
-        hideError();
+        <a
+            href="/species"
+            class="feature-card"
+        >
 
-        return true;
+            <div class="feature-icon">
+                🌸
+            </div>
 
-    }
+            <h3>
+                Species
+            </h3>
 
+            <p>
+                Tìm hiểu đặc điểm của Setosa, Versicolor
+                và Virginica qua hình ảnh thực tế.
+            </p>
 
-    /* ===============================
-       ERROR
-    =============================== */
+        </a>
 
-    function showError(message) {
+    </div>
 
-        const error =
-            document.getElementById("error");
+</section>
 
-        error.textContent = message;
 
-        error.style.display = "block";
 
-    }
+<section class="home-section species-preview">
 
+    <div class="section-heading">
 
-    function hideError() {
+        <span class="eyebrow">
+            THREE SPECIES
+        </span>
 
-        const error =
-            document.getElementById("error");
+        <h2>
+            Ba loài hoa trong bộ dữ liệu
+        </h2>
 
-        error.style.display = "none";
+        <p>
+            Bộ dữ liệu Iris gồm 150 mẫu thuộc ba loài hoa.
+        </p>
 
-    }
+    </div>
 
 
-    /* ===============================
-       PREDICT
-    =============================== */
+    <div class="mini-species-grid">
 
-    async function predict() {
 
-        if (!validate()) {
-            return;
-        }
+        <a
+            href="/species"
+            class="mini-species-card"
+        >
 
+            <img
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Iris_setosa.JPG"
+                alt="Iris Setosa"
+            >
 
-        const sepal_length =
-            Number(
-                document.getElementById(
-                    "sepal_length"
-                ).value
-            );
+            <div>
 
+                <span>
+                    SPECIES 01
+                </span>
 
-        const sepal_width =
-            Number(
-                document.getElementById(
-                    "sepal_width"
-                ).value
-            );
+                <h3>
+                    Iris Setosa
+                </h3>
 
+            </div>
 
-        const petal_length =
-            Number(
-                document.getElementById(
-                    "petal_length"
-                ).value
-            );
+        </a>
 
 
-        const petal_width =
-            Number(
-                document.getElementById(
-                    "petal_width"
-                ).value
-            );
 
+        <a
+            href="/species"
+            class="mini-species-card"
+        >
 
-        const prediction =
-            document.getElementById(
-                "prediction"
-            );
+            <img
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Iris_versicolor.jpg"
+                alt="Iris Versicolor"
+            >
 
-        const flowerName =
-            document.getElementById(
-                "flowerName"
-            );
+            <div>
 
-        const description =
-            document.getElementById(
-                "flowerDescription"
-            );
+                <span>
+                    SPECIES 02
+                </span>
 
+                <h3>
+                    Iris Versicolor
+                </h3>
 
-        prediction.textContent =
-            "Analyzing...";
+            </div>
 
-        flowerName.textContent =
-            "SVM đang xử lý";
+        </a>
 
-        description.textContent =
-            "Đang gửi dữ liệu tới mô hình học máy...";
 
 
-        try {
+        <a
+            href="/species"
+            class="mini-species-card"
+        >
 
-            const response =
-                await fetch(
-                    "/predict",
-                    {
+            <img
+                src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Iris_virginica_-_NRCS.jpg"
+                alt="Iris Virginica"
+            >
 
-                        method: "POST",
+            <div>
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                <span>
+                    SPECIES 03
+                </span>
 
-                        body:
-                            JSON.stringify({
+                <h3>
+                    Iris Virginica
+                </h3>
 
-                                sepal_length:
-                                    sepal_length,
+            </div>
 
-                                sepal_width:
-                                    sepal_width,
+        </a>
 
-                                petal_length:
-                                    petal_length,
 
-                                petal_width:
-                                    petal_width
+    </div>
 
-                            })
+</section>
 
-                    }
-                );
 
 
-            if (!response.ok) {
+</main>
 
-                throw new Error(
-                    "API Error: " +
-                    response.status
-                );
 
-            }
 
+<footer>
 
-            const result =
-                await response.json();
+    <strong>
+        IRIS AI
+    </strong>
 
+    <span>
+        FASTAPI + SVM • MACHINE LEARNING PROJECT
+    </span>
 
-            showResult(
-                result.prediction
-            );
+</footer>
 
-        }
-
-
-        catch (error) {
-
-            console.error(error);
-
-
-            showError(
-                "Không thể kết nối tới API. " +
-                "Hãy kiểm tra FastAPI và thử lại."
-            );
-
-
-            prediction.textContent =
-                "Prediction Failed";
-
-            flowerName.textContent =
-                "Connection Error";
-
-            description.textContent =
-                "Không nhận được kết quả từ mô hình SVM.";
-
-        }
-
-    }
-
-
-    /* ===============================
-       HIỂN THỊ KẾT QUẢ
-    =============================== */
-
-    function showResult(prediction) {
-
-        const value =
-            String(prediction).toLowerCase();
-
-
-        const image =
-            document.getElementById(
-                "flowerImage"
-            );
-
-        const predictionText =
-            document.getElementById(
-                "prediction"
-            );
-
-        const flowerName =
-            document.getElementById(
-                "flowerName"
-            );
-
-        const description =
-            document.getElementById(
-                "flowerDescription"
-            );
-
-
-        let flower;
-
-
-        /* SETOSA */
-
-        if (
-            value.includes("setosa")
-        ) {
-
-            flower =
-                flowerData.setosa;
-
-        }
-
-
-        /* VERSICOLOR */
-
-        else if (
-            value.includes("versicolor")
-        ) {
-
-            flower =
-                flowerData.versicolor;
-
-        }
-
-
-        /* VIRGINICA */
-
-        else if (
-            value.includes("virginica")
-        ) {
-
-            flower =
-                flowerData.virginica;
-
-        }
-
-
-        /* UNKNOWN */
-
-        else {
-
-            predictionText.textContent =
-                prediction;
-
-            flowerName.textContent =
-                "Không xác định";
-
-            description.textContent =
-                "Mô hình trả về kết quả chưa được nhận diện.";
-
-            return;
-
-        }
-
-
-        /* TEXT */
-
-        predictionText.textContent =
-            flower.name;
-
-        flowerName.textContent =
-            flower.name;
-
-        description.textContent =
-            flower.description;
-
-
-        /* IMAGE */
-
-        image.style.opacity = "0";
-
-
-        setTimeout(
-            function () {
-
-                image.src =
-                    flower.image;
-
-                image.alt =
-                    flower.name;
-
-                image.onload =
-                    function () {
-
-                        image.style.opacity =
-                            "1";
-
-                    };
-
-            },
-            200
-        );
-
-    }
-
-
-    /* ===============================
-       SAMPLE
-    =============================== */
-
-    function fillSample() {
-
-        document.getElementById(
-            "sepal_length"
-        ).value = "5.1";
-
-
-        document.getElementById(
-            "sepal_width"
-        ).value = "3.5";
-
-
-        document.getElementById(
-            "petal_length"
-        ).value = "1.4";
-
-
-        document.getElementById(
-            "petal_width"
-        ).value = "0.2";
-
-
-        hideError();
-
-    }
-
-
-    /* ===============================
-       RESET
-    =============================== */
-
-    function resetForm() {
-
-        document.getElementById(
-            "sepal_length"
-        ).value = "";
-
-
-        document.getElementById(
-            "sepal_width"
-        ).value = "";
-
-
-        document.getElementById(
-            "petal_length"
-        ).value = "";
-
-
-        document.getElementById(
-            "petal_width"
-        ).value = "";
-
-
-        document.getElementById(
-            "prediction"
-        ).textContent =
-            "Waiting...";
-
-
-        document.getElementById(
-            "flowerName"
-        ).textContent =
-            "Iris Flower";
-
-
-        document.getElementById(
-            "flowerDescription"
-        ).textContent =
-            "Nhập 4 thông số ở bên trái và nhấn Analyze để mô hình SVM nhận diện loài hoa.";
-
-
-        document.getElementById(
-            "flowerImage"
-        ).src =
-            "https://commons.wikimedia.org/wiki/Special:FilePath/Iris_setosa_kz01.jpg";
-
-
-        document.getElementById(
-            "flowerImage"
-        ).alt =
-            "Iris Setosa";
-
-
-        document.getElementById(
-            "flowerImage"
-        ).style.opacity =
-            "1";
-
-
-        hideError();
-
-    }
-
-</script>
 
 </body>
 

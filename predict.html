@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Predict - IRIS AI</title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="brand">
+
+            <div class="brand-flower">
+                🌸
+            </div>
+
+            <div>
+
+                <strong>
+                    IRIS AI
+                </strong>
+
+                <span>
+                    SVM FLOWER CLASSIFICATION
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a
+                href="/predict"
+                class="active"
+            >
+                Predict
+            </a>
+
+            <a href="/visualization">
+                Visualization
+            </a>
+
+            <a href="/species">
+                Species
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+
+<main class="page">
+
+
+<section class="page-header">
+
+    <span class="eyebrow">
+        SVM PREDICTION
+    </span>
+
+    <h1>
+        Dự đoán loài hoa Iris
+    </h1>
+
+    <p>
+        Nhập bốn thông số đo được của một mẫu hoa.
+        Mô hình SVM sẽ phân tích dữ liệu và trả về
+        loài hoa được dự đoán.
+    </p>
+
+</section>
+
+
+
+<section class="predict-layout">
+
+
+<div class="form-card">
+
+    <div class="card-top">
+
+        <h2>
+            Flower Features
+        </h2>
+
+        <span class="model-tag">
+            SVM MODEL
+        </span>
+
+    </div>
+
+
+    <form
+        action="/predict"
+        method="post"
+    >
+
+
+        <div class="form-group">
+
+            <label>
+                Sepal Length
+                <small>cm</small>
+            </label>
+
+            <input
+                type="number"
+                name="sepal_length"
+                step="0.1"
+                min="0.1"
+                placeholder="Ví dụ: 5.1"
+                required
+            >
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label>
+                Sepal Width
+                <small>cm</small>
+            </label>
+
+            <input
+                type="number"
+                name="sepal_width"
+                step="0.1"
+                min="0.1"
+                placeholder="Ví dụ: 3.5"
+                required
+            >
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label>
+                Petal Length
+                <small>cm</small>
+            </label>
+
+            <input
+                type="number"
+                name="petal_length"
+                step="0.1"
+                min="0.1"
+                placeholder="Ví dụ: 1.4"
+                required
+            >
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label>
+                Petal Width
+                <small>cm</small>
+            </label>
+
+            <input
+                type="number"
+                name="petal_width"
+                step="0.1"
+                min="0.1"
+                placeholder="Ví dụ: 0.2"
+                required
+            >
+
+        </div>
+
+
+
+        <button
+            type="submit"
+            class="btn primary full"
+        >
+            ✦ DỰ ĐOÁN
+        </button>
+
+
+    </form>
+
+
+    <div class="sample-box">
+
+        <strong>
+            Mẫu Iris Setosa
+        </strong>
+
+        <p>
+            5.1 / 3.5 / 1.4 / 0.2
+        </p>
+
+    </div>
+
+
+</div>
+
+
+
+<div class="predict-info">
+
+    <div class="predict-orbit">
+
+        <div class="orbit-flower">
+            🌸
+        </div>
+
+    </div>
+
+
+    <span class="result-label">
+        PREDICTED SPECIES
+    </span>
+
+
+    <h2>
+        Awaiting input
+    </h2>
+
+
+    <p>
+        Nhập thông số bên trái và nhấn
+        <strong>Dự đoán</strong>
+        để bắt đầu phân loại.
+    </p>
+
+</div>
+
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+    <strong>
+        IRIS AI
+    </strong>
+
+    <span>
+        SUPPORT VECTOR MACHINE
+    </span>
+
+</footer>
+
+
+</body>
+
+</html>
